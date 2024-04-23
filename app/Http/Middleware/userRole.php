@@ -19,7 +19,7 @@ class userRole
             return $next($request);
             
         }else{
-            return redirect()->route('stemwebWelcome')->with('error', 'Unauthorized Access');
+            return redirect('/');
         }
         
     }

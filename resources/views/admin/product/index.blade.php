@@ -49,7 +49,7 @@
                 <tr>
                     <td>{{$c}}</td>
                     <td>{{$item->category->name}}</td>
-                    <td><img src="{{asset('storage/product_images/'.$item->image)}}" width="100px"></td>
+                    <td><img src="/productimages/{{ $item->image }}" width="100px"></td>
                     <td>{{$item->name}}</td>
                     <td>{{$item->description}}</td>
                     <td>{{$item->features}}</td>

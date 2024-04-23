@@ -20,29 +20,12 @@ class ProductController extends Controller
         $categories = Category::all();
         return view('admin.product.create', compact('categories'));
     }
-    //***This is basic data store method************************************************************************************************* */
-    // public function store(Request $request)
-    // {
-    //     $category = Category::findOrFail($request->category_id);
-    //     $category->product()->create([
-    //         'name' => $request->name,
-    //         'price' => $request->price,
-    //         'image' => $request->image,
-    //         'description' => $request->description,
-    //         'features' => $request->features,
-    //         'quantity' => $request->quantity,
-    //         // 'category_id' => $request->category_id
-    //     ]);
 
-    //     return redirect()->route('admin.product.index')->with('success', 'Product created successfully');
-       
-    // }
-    //***************************************************************************************** */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
+            'name' => 'required',
             'price' => 'required|numeric',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'description' => 'required|string',
@@ -50,22 +33,20 @@ class ProductController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+        $input = $request->all();
+
+        if ($image = $request->file('image')) {
+            $destinationPath = 'productimages/';
+            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
+            $image->move($destinationPath, $profileImage);
+            $input['image'] = "$profileImage";
         }
 
-        $category = Category::findOrFail($request->category_id);
+        Product::create($input);
 
-        $category->product()->create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'image' => $request->file('image')->store('product_images'), 
-            'description' => $request->description,
-            'features' => $request->features,
-            'quantity' => $request->quantity,
-        ]);
-
-        return redirect()->route('admin.product.index')->with('success', 'Product created successfully');
+       
+        return redirect()->route('admin.product.index')
+                        ->with('success','Product created successfully.');
     }
 
     public function edit($id)
@@ -75,14 +56,7 @@ class ProductController extends Controller
         return view('admin.product.edit', compact('category','product'));
     }
 
-    /////*******This is basic data update method**********************************************************************************
-    // public function update(Request $request, $id)
-    // {
-    //     $product = Product::findOrFail($id);
-    //     $product->update($request->all());
-    //     return redirect()->route('admin.product.index')->with('success', 'Product updated successfully');
-    // }
-    ///////*****************************************************************************************
+    
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -110,6 +84,7 @@ class ProductController extends Controller
         ]);
 
         return redirect()->route('admin.product.index')->with('success', 'Product updated successfully');
+        
     }
 
     public function delete(Request $request, $id)

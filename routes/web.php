@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Userlist;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NewsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +18,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/',[Controller::class, 'index'])->name('stemwebWelcome');  
+Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::middleware([
     'auth:sanctum',
@@ -53,5 +56,20 @@ Route::prefix('admin')->middleware(['auth','userRole'])->group(function () {
     Route::get('category/product/{id}/edit', [ProductController::class, 'edit'])->name('admin.product.edit');
     Route::put('category/product/{id}', [ProductController::class, 'update'])->name('admin.product.update');
     Route::delete('category/product/{id}', [ProductController::class, 'delete'])->name('admin.product.delete');
+
+    //News
+    Route::get('news', [NewsController::class, 'index'])->name('admin.news.index');
+    Route::get('news/create', [NewsController::class, 'create'])->name('admin.news.create');
+    Route::post('news', [NewsController::class, 'store'])->name('admin.news.store');
+    Route::get('news/{id}/edit', [NewsController::class, 'edit'])->name('admin.news.edit');
+    Route::put('news/{id}', [NewsController::class, 'update'])->name('admin.news.update');
+    Route::delete('news/{id}', [NewsController::class, 'delete'])->name('admin.news.delete');
+    Route::get('news/{id}', [NewsController::class, 'show'])->name('admin.news.show');
+
+
+    //invalid route rederect
+    Route::get('{any}', function () {
+        return view('/');
+    })->where('any', '.*');
 
 });
